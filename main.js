@@ -1,34 +1,35 @@
-const el = document.querySelector(".item");
+const els = document.querySelectorAll(".item");
 
 let isResizing = false;
+for (let el of els) {
+  el.addEventListener("mousedown", mousedown);
 
-el.addEventListener("mousedown", mousedown);
+  function mousedown(e) {
+    window.addEventListener("mousemove", mousemove);
+    window.addEventListener("mouseup", mouseup);
 
-function mousedown(e) {
-  window.addEventListener("mousemove", mousemove);
-  window.addEventListener("mouseup", mouseup);
+    let prevX = e.clientX;
+    let prevY = e.clientY;
 
-  let prevX = e.clientX;
-  let prevY = e.clientY;
+    function mousemove(e) {
+      if (!isResizing) {
+        let newX = prevX - e.clientX;
+        let newY = prevY - e.clientY;
 
-  function mousemove(e) {
-    if (!isResizing) {
-      let newX = prevX - e.clientX;
-      let newY = prevY - e.clientY;
+        const rect = el.getBoundingClientRect();
 
-      const rect = el.getBoundingClientRect();
+        el.style.left = rect.left - newX + "px";
+        el.style.top = rect.top - newY + "px";
 
-      el.style.left = rect.left - newX + "px";
-      el.style.top = rect.top - newY + "px";
-
-      prevX = e.clientX;
-      prevY = e.clientY;
+        prevX = e.clientX;
+        prevY = e.clientY;
+      }
     }
-  }
 
-  function mouseup() {
-    window.removeEventListener("mousemove", mousemove);
-    window.removeEventListener("mouseup", mouseup);
+    function mouseup() {
+      window.removeEventListener("mousemove", mousemove);
+      window.removeEventListener("mouseup", mouseup);
+    }
   }
 }
 
@@ -36,71 +37,50 @@ const resizers = document.querySelectorAll(".resizer");
 let currentResizer;
 
 for (let resizer of resizers) {
-  resizer.addEventListener("mousedown", mousedown);
+  for (let el of els) {
+    resizer.addEventListener("mousedown", mousedown);
 
-  function mousedown(e) {
-    currentResizer = e.target;
-    isResizing = true;
+    function mousedown(e) {
+      currentResizer = e.target;
+      isResizing = true;
 
-    let prevX = e.clientX;
-    let prevY = e.clientY;
+      let prevX = e.clientX;
+      let prevY = e.clientY;
 
-    window.addEventListener("mousemove", mousemove);
-    window.addEventListener("mouseup", mouseup);
+      window.addEventListener("mousemove", mousemove);
+      window.addEventListener("mouseup", mouseup);
 
-    function mousemove(e) {
-      const rect = el.getBoundingClientRect();
+      function mousemove(e) {
+        const rect = el.getBoundingClientRect();
 
-      if (currentResizer.classList.contains("se")) {
-        el.style.width = rect.width - (prevX - e.clientX) + "px";
-        el.style.height = rect.height - (prevY - e.clientY) + "px";
-      } else if (currentResizer.classList.contains("sw")) {
-        el.style.width = rect.width + (prevX - e.clientX) + "px";
-        el.style.height = rect.height - (prevY - e.clientY) + "px";
-        el.style.left = rect.left - (prevX - e.clientX) + "px";
-      } else if (currentResizer.classList.contains("ne")) {
-        el.style.width = rect.width - (prevX - e.clientX) + "px";
-        el.style.height = rect.height + (prevY - e.clientY) + "px";
-        el.style.top = rect.top - (prevY - e.clientY) + "px";
-      } else {
-        el.style.width = rect.width + (prevX - e.clientX) + "px";
-        el.style.height = rect.height + (prevY - e.clientY) + "px";
-        el.style.top = rect.top - (prevY - e.clientY) + "px";
-        el.style.left = rect.left - (prevX - e.clientX) + "px";
+        if (currentResizer.classList.contains("se")) {
+          el.style.width = rect.width - (prevX - e.clientX) + "px";
+          el.style.height = rect.height - (prevY - e.clientY) + "px";
+        } else if (currentResizer.classList.contains("sw")) {
+          el.style.width = rect.width + (prevX - e.clientX) + "px";
+          el.style.height = rect.height - (prevY - e.clientY) + "px";
+          el.style.left = rect.left - (prevX - e.clientX) + "px";
+        } else if (currentResizer.classList.contains("ne")) {
+          el.style.width = rect.width - (prevX - e.clientX) + "px";
+          el.style.height = rect.height + (prevY - e.clientY) + "px";
+          el.style.top = rect.top - (prevY - e.clientY) + "px";
+        } else {
+          el.style.width = rect.width + (prevX - e.clientX) + "px";
+          el.style.height = rect.height + (prevY - e.clientY) + "px";
+          el.style.top = rect.top - (prevY - e.clientY) + "px";
+          el.style.left = rect.left - (prevX - e.clientX) + "px";
+        }
+
+        prevX = e.clientX;
+        prevY = e.clientY;
       }
 
-      prevX = e.clientX;
-      prevY = e.clientY;
-    }
-
-    function mouseup() {
-      window.removeEventListener("mousemove", mousemove);
-      window.removeEventListener("mouseup", mouseup);
-      isResizing = false;
+      function mouseup() {
+        window.removeEventListener("mousemove", mousemove);
+        window.removeEventListener("mouseup", mouseup);
+        isResizing = false;
+      }
     }
   }
 }
-// Use this:
 
-//     document.querySelectorAll('.draggableDiv').forEach(div => {
-//         div.onmousedown = function(e) {
-//             document.querySelectorAll('.draggableDiv').forEach(div => div.style.zIndex = 0);
-//             div.style.zIndex = 1;
-            
-//             const rect = div.getBoundingClientRect();
-//             offsetX = rect.left - e.clientX;
-//             offsetY = rect.top - e.clientY;
-
-//             window.onmousemove = function(e) {
-//                 div.style.left = e.clientX + offsetX +"px";
-//                 div.style.top = e.clientY + offsetY +"px";
-//             }
-//             window.onmouseup = function(e) {
-//                 window.onmousemove = null;
-//                 window.onmouseup = null;
-//             }
-//         }
-//     });
-
-// And then just give your divs the draggableDiv-Class:
-// <div class="draggableDiv"> ... </div>
